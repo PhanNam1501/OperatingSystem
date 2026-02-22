@@ -1,0 +1,68 @@
+1. Request (Yêu cầu Nhập/Xuất)
+Struct này đại diện cho một tác vụ I/O (đọc/ghi) duy nhất mà ổ đĩa cần xử lý.
+
+block: Số hiệu của khối dữ liệu (sector) cần truy cập (ví dụ: block số 10).
+
+index: Vị trí ban đầu của yêu cầu này trong hàng đợi đầu vào. Việc lưu lại index giúp chương trình dễ dàng theo dõi xem yêu cầu này đang ở trạng thái nào (đang chờ, đang xử lý, hay đã xong).
+
+2. BlockInfo (Thông tin vật lý của Block)
+Lưu trữ tọa độ không gian thực tế của một block cụ thể trên mặt đĩa từ.
+
+track: Số thứ tự của rãnh chứa block này (ví dụ: rãnh ngoài cùng là 0, rãnh giữa là 1).
+
+angle: Góc quay của block trên mặt đĩa (tính bằng độ, từ 0 đến 360).
+
+name: Định danh của block (chính là số thứ tự block, ví dụ như 0, 1, 2...).
+
+3. Disk (Trạng thái tổng thể của Ổ đĩa)
+Đây là "trái tim" của chương trình mô phỏng, chứa hàng loạt tham số được chia thành các nhóm chính sau:
+
+Nhóm Cấu hình (Input Parameters):
+
+addr, addrDesc: Cấu hình chuỗi yêu cầu đầu vào (danh sách block cụ thể hoặc mô tả ngẫu nhiên).
+
+lateAddr, lateAddrDesc: Cấu hình cho các yêu cầu "đến muộn" (để mô phỏng luồng I/O liên tục).
+
+policy: Thuật toán lập lịch đang sử dụng (FIFO, SSTF, SATF, BSATF).
+
+seekSpeedBase, rotateSpeed: Tốc độ vật lý của cần gạt (Seek) và đĩa quay (Rotate).
+
+skew: Độ lệch rãnh (Track skew) – sự chênh lệch vị trí góc của các block giữa các rãnh liền kề.
+
+window: Kích thước cửa sổ lập lịch (số lượng yêu cầu tối đa mà thuật toán được phép nhìn vào cùng lúc để sắp xếp).
+
+zoning: Phân vùng ổ đĩa (các rãnh ngoài có nhiều block hơn rãnh trong).
+
+Nhóm Bản đồ Vật lý (Physical Layout):
+
+blockToTrackMap, blockToAngleMap: Bản đồ tra cứu nhanh xem một block nằm ở rãnh nào và ở góc bao nhiêu độ.
+
+tracksBeginEnd: Lưu block đầu tiên và block cuối cùng của mỗi rãnh.
+
+maxBlock: Số hiệu block lớn nhất có trên ổ đĩa.
+
+Nhóm Trạng thái Lập lịch & Hàng đợi (Queue & Scheduling):
+
+requestQueue, requestState: Danh sách các yêu cầu đang chờ và trạng thái hiện tại của từng yêu cầu.
+
+currWindow, fairWindow: Dùng cho thuật toán BSATF (Bounded SATF) để chống "chết đói" (starvation), buộc ổ đĩa phải phục vụ các yêu cầu cũ trước khi mở rộng cửa sổ nhận thêm yêu cầu mới.
+
+Nhóm Cơ học (Mechanical State):
+
+armTrack, armSpeed, armTarget: Trạng thái của cần gạt đầu đọc (đang ở rãnh nào, tốc độ di chuyển bao nhiêu, và mục tiêu đang nhắm đến là rãnh nào).
+
+armX1, armTargetX1: Tọa độ X giả lập (kế thừa từ logic vẽ UI của Python) dùng để tính toán quãng đường di chuyển của cần gạt.
+
+angle: Góc quay hiện tại của toàn bộ đĩa từ so với mốc ban đầu.
+
+state: Trạng thái hiện tại của ổ đĩa (đang rảnh - NULL, đang di chuyển cần gạt - SEEK, đang chờ đĩa quay - ROTATE, hay đang truyền dữ liệu - XFER).
+
+Nhóm Thời gian & Thống kê (Timing & Statistics):
+
+timer: Đồng hồ đếm nhịp (tick) của toàn bộ hệ thống mô phỏng.
+
+seekBegin, rotBegin, xferBegin: Lưu lại mốc thời gian bắt đầu của từng giai đoạn để tính toán thời gian trôi qua.
+
+seekTotal, rotTotal, xferTotal: Tổng thời gian cộng dồn ổ đĩa đã tiêu tốn cho từng loại hoạt động.
+
+isDone: Cờ (flag) báo hiệu tất cả yêu cầu đã được xử lý xong và dừng mô phỏng.
