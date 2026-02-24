@@ -8,7 +8,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func main() {
+func main5() {
 	fd, err := unix.Open("test.txt", unix.O_RDONLY, 0)
 	if err != nil {
 		panic(err)
