@@ -22,4 +22,7 @@ func main7() {
 	}
 	fmt.Println(rc)
 
+	if err := unix.Fsync(fd); err != nil {
+		panic(err)
+	}
 }
