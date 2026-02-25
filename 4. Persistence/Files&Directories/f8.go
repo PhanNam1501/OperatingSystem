@@ -10,7 +10,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func main() {
+func main8() {
 	if len(os.Args) < 2 {
 		return
 	}
