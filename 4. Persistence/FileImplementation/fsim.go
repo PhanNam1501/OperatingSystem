@@ -601,7 +601,7 @@ func (fs *FileSystem) Run(numRequests int) {
 	}
 }
 
-func main() {
+func main1() {
 	seed := flag.Int("s", 0, "the random seed")
 	numInodes := flag.Int("i", 8, "number of inodes in file system")
 	numData := flag.Int("d", 8, "number of data blocks in file system")
